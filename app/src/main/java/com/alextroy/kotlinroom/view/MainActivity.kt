@@ -61,7 +61,6 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener {
             addPerson(name, surName)
             adapter.setData(person)
-            registerAllPersonListener()
         }
     }
 
