@@ -1,4 +1,4 @@
-package com.alextroy.kotlinroom.bd
+package com.alextroy.kotlinroom.data
 
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Delete

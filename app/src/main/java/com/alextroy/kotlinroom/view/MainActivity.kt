@@ -6,22 +6,28 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import com.alextroy.kotlinroom.R
-import com.alextroy.kotlinroom.bd.MyApp
-import com.alextroy.kotlinroom.bd.Person
+import com.alextroy.kotlinroom.data.Person
+import com.alextroy.kotlinroom.data.PersonDao
+import com.alextroy.kotlinroom.di.DaggerAppComponent
+import com.alextroy.kotlinroom.di.RoomModule
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.person_list.*
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
+
+    private val name = "Alex"
+    private val surName = "Troy"
 
     private lateinit var person: List<Person>
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var adapter: MyAdapter
     private lateinit var fab: FloatingActionButton
 
-    private val name = "Alex"
-    private val surName = "Troy"
+    @Inject
+    lateinit var personDao: PersonDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +38,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
+        DaggerAppComponent
+            .builder()
+            .roomModule(RoomModule(this))
+            .build()
+            .inject(this)
+
         fab = findViewById(R.id.fab)
         linearLayoutManager = LinearLayoutManager(this)
         person = ArrayList()
@@ -50,18 +62,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+//    private fun addPerson(firstName: String, lastName: String) {
+//        val person = Person(0, firstName, lastName)
+//        Single.fromCallable { RoomModule.database!!.personDao().insert(person) }
+//            .subscribeOn(Schedulers.io())
+//            .subscribe()
+//    }
+
+//    @SuppressLint("CheckResult")
+//    private fun registerAllPersonListener() {
+//        RoomModule.database!!.personDao().getAllPeople()
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe { adapter.setData(it) }
+//    }
+
     private fun addPerson(firstName: String, lastName: String) {
         val person = Person(0, firstName, lastName)
-        Single.fromCallable { MyApp.database!!.personDao().insert(person) }
+        Single.fromCallable { personDao.insert(person) }
             .subscribeOn(Schedulers.io())
             .subscribe()
     }
 
     @SuppressLint("CheckResult")
     private fun registerAllPersonListener() {
-        MyApp.database!!.personDao().getAllPeople()
+        personDao.getAllPeople()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { adapter.setData(it) }
     }
+
+
 }

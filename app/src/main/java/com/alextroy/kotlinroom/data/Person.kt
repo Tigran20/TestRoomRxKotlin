@@ -1,4 +1,4 @@
-package com.alextroy.kotlinroom.bd
+package com.alextroy.kotlinroom.data
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey

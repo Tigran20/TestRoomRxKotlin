@@ -6,14 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.alextroy.kotlinroom.R
-import com.alextroy.kotlinroom.bd.MyApp
-import com.alextroy.kotlinroom.bd.Person
+import com.alextroy.kotlinroom.data.Person
+import com.alextroy.kotlinroom.data.PersonDao
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.person_list_item.view.*
+import javax.inject.Inject
 
 class MyAdapter(private var items: List<Person>, val context: Context) : RecyclerView.Adapter<ViewHolder>() {
+
+    @Inject
+    lateinit var personDao: PersonDao
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.person_list_item, parent, false))
@@ -25,12 +29,11 @@ class MyAdapter(private var items: List<Person>, val context: Context) : Recycle
         holder.surName.text = person.lastName
 
         holder.delete.setOnClickListener {
-            Single.fromCallable { MyApp.database!!.personDao()
-                .delete(person) }
+            Single.fromCallable { personDao.delete(person) }
                 .subscribeOn(Schedulers.io())
                 .subscribe()
 
-            MyApp.database!!.personDao().getAllPeople()
+            personDao.getAllPeople()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { setData(it) }
