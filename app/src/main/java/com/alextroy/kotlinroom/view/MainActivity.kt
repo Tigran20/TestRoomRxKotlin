@@ -47,7 +47,10 @@ class MainActivity : AppCompatActivity() {
         fab = findViewById(R.id.fab)
         linearLayoutManager = LinearLayoutManager(this)
         person = ArrayList()
-        adapter = MyAdapter(person, this)
+        adapter = MyAdapter(person, this) { person ->
+            deletePerson(person)
+            registerAllPersonListener()
+        }
 
         recycler_view.layoutManager = linearLayoutManager
         recycler_view.adapter = adapter
@@ -62,24 +65,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    private fun addPerson(firstName: String, lastName: String) {
-//        val person = Person(0, firstName, lastName)
-//        Single.fromCallable { RoomModule.database!!.personDao().insert(person) }
-//            .subscribeOn(Schedulers.io())
-//            .subscribe()
-//    }
-
-//    @SuppressLint("CheckResult")
-//    private fun registerAllPersonListener() {
-//        RoomModule.database!!.personDao().getAllPeople()
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe { adapter.setData(it) }
-//    }
-
     private fun addPerson(firstName: String, lastName: String) {
         val person = Person(0, firstName, lastName)
         Single.fromCallable { personDao.insert(person) }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
+    }
+
+    private fun deletePerson(person: Person) {
+        Single.fromCallable { personDao.delete(person) }
             .subscribeOn(Schedulers.io())
             .subscribe()
     }
