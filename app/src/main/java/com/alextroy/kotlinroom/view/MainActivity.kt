@@ -54,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         val person = Person(0, firstName, lastName)
         Single.fromCallable { MyApp.database!!.personDao().insert(person) }
             .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribe()
     }
 

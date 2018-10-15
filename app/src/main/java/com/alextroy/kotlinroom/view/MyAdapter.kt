@@ -6,7 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.alextroy.kotlinroom.R
+import com.alextroy.kotlinroom.bd.MyApp
 import com.alextroy.kotlinroom.bd.Person
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.person_list_item.view.*
 
 class MyAdapter(private var items: List<Person>, val context: Context) : RecyclerView.Adapter<ViewHolder>() {
@@ -19,6 +23,18 @@ class MyAdapter(private var items: List<Person>, val context: Context) : Recycle
         val person: Person = items[position]
         holder.name.text = person.firstName
         holder.surName.text = person.lastName
+
+        holder.delete.setOnClickListener {
+            Single.fromCallable { MyApp.database!!.personDao()
+                .delete(person) }
+                .subscribeOn(Schedulers.io())
+                .subscribe()
+
+            MyApp.database!!.personDao().getAllPeople()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { setData(it) }
+        }
     }
 
     override fun getItemCount(): Int {
@@ -34,4 +50,5 @@ class MyAdapter(private var items: List<Person>, val context: Context) : Recycle
 class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val name = view.name!!
     val surName = view.surname!!
+    val delete = view.delete!!
 }
