@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun addPerson(firstName: String, lastName: String) {
         val person = Person(0, firstName, lastName)
-        Single.fromCallable { MyApp.getInstance(this).personDao().insert(person) }
+        Single.fromCallable { MyApp.database!!.personDao().insert(person) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe()
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     private fun registerAllPersonListener() {
-        MyApp.getInstance(this).personDao().getAllPeople()
+        MyApp.database!!.personDao().getAllPeople()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { adapter.setData(it) }
